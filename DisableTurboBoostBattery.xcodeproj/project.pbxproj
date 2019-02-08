@@ -263,6 +263,7 @@
 				MODULE_NAME = pk.qwerty12.DisableTurboBoostBattery;
 				MODULE_VERSION = 2.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -279,6 +280,7 @@
 				MODULE_NAME = pk.qwerty12.DisableTurboBoostBattery;
 				MODULE_VERSION = 2.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;

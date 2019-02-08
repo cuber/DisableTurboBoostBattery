@@ -22,8 +22,11 @@
 
 #include "DisableTurboBoostBattery.h"
 #include "DisableTurboBoost.h"
+#include <IOKit/IOLib.h>
+
 
 #define super IOService
+
 
 OSDefineMetaClassAndStructors(DisableTurboBoostBattery, IOService)
 
@@ -95,11 +98,13 @@ IOReturn DisableTurboBoostBattery::powerSourceStateChanged(UInt32 messageType, _
 
 void DisableTurboBoostBattery::actOnChangedPowerState()
 {
-	if (pPowerSource && isOnAC != pPowerSource->externalChargeCapable() && pPowerSource->batteryInstalled()) {
-		if ((isOnAC = pPowerSource->externalChargeCapable()))
-			enable_tb();
+    IOLog("externalChargeCapable: %d\n", pPowerSource->externalChargeCapable());
+    IOLog("IsCharging: %d\n", pPowerSource->isCharging());
+	if (pPowerSource) {
+		if (pPowerSource->isCharging())
+            enableTurboBoost();
 		else
-			disable_tb();
+            disableTurboBoost();
 	}
 }
 
@@ -107,8 +112,7 @@ IOReturn DisableTurboBoostBattery::setPowerState(unsigned long whichState, __unu
 {
 	// Workaround bug with ASUS laptops that enable Turbo Boost again when resuming from sleep by enabling it ourselves before going to sleep and getting the kext to re-apply the correct state
 	if (whichState == 0) {
-		enable_tb();
-		isOnAC = !isOnAC;
+        enableTurboBoost();
 	}
 
 	return kIOPMAckImplied;
@@ -116,20 +120,40 @@ IOReturn DisableTurboBoostBattery::setPowerState(unsigned long whichState, __unu
 
 bool DisableTurboBoostBattery::start(IOService *provider)
 {
-	if (!super::start(provider))
-		return false;
-
-	isOnAC = true;
-	startPM(provider);
+    if (!super::start(provider))
+        return false;
+    
+    tb_enabled = true;
+    disableTurboBoost();
+    startPM(provider);
 
 	return true;
 }
 
 void DisableTurboBoostBattery::stop(IOService *provider)
 {
-	stopPM();
+    stopPM();
 
-	enable_tb();
+    enableTurboBoost();
 
 	super::stop(provider);
+}
+
+void DisableTurboBoostBattery::enableTurboBoost()
+{
+    IOLog("enableTurboBoost, tb_enabled: %d\n", tb_enabled);
+    if (!tb_enabled) {
+        enable_tb();
+        tb_enabled = true;
+    }
+}
+
+
+void DisableTurboBoostBattery::disableTurboBoost()
+{
+    IOLog("disableTurboBoost, tb_enabled: %d\n", tb_enabled);
+    if (tb_enabled) {
+        disable_tb();
+        tb_enabled = false;
+    }
 }

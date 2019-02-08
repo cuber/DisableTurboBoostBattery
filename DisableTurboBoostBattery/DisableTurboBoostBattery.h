@@ -43,12 +43,14 @@ private:
 	IONotifier *powerStateNotifier;
 	IOPMPowerSource *pPowerSource;
 
-	bool isOnAC;
+    bool tb_enabled;
 
 	void startPM(IOService *provider);
 	void stopPM();
 	void actOnChangedPowerState();
 	void startOrStop();
+    void enableTurboBoost();
+    void disableTurboBoost();
 
     static bool _powerSourcePublished(void * target, void * refCon,
                                       IOService * newService, IONotifier * notifier);
