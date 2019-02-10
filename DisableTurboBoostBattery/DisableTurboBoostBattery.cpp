@@ -98,10 +98,14 @@ IOReturn DisableTurboBoostBattery::powerSourceStateChanged(UInt32 messageType, _
 
 void DisableTurboBoostBattery::actOnChangedPowerState()
 {
-    IOLog("externalChargeCapable: %d\n", pPowerSource->externalChargeCapable());
-    IOLog("IsCharging: %d\n", pPowerSource->isCharging());
+    IOLog("TB:externalConnected: %d\n", pPowerSource->externalConnected());
+    IOLog("TB:externalChargeCapable: %d\n", pPowerSource->externalChargeCapable());
+    IOLog("TB:IsCharging: %d\n", pPowerSource->isCharging());
+    IOLog("TB:voltage: %u\n", pPowerSource->voltage());
+    IOLog("TB:adapterInfo: %d\n", pPowerSource->adapterInfo());
+    
 	if (pPowerSource) {
-		if (pPowerSource->isCharging())
+		if (pPowerSource->externalConnected())
             enableTurboBoost();
 		else
             disableTurboBoost();
@@ -141,7 +145,7 @@ void DisableTurboBoostBattery::stop(IOService *provider)
 
 void DisableTurboBoostBattery::enableTurboBoost()
 {
-    IOLog("enableTurboBoost, tb_enabled: %d\n", tb_enabled);
+    IOLog("TB:enableTurboBoost, tb_enabled: %d\n", tb_enabled);
     if (!tb_enabled) {
         enable_tb();
         tb_enabled = true;
@@ -151,7 +155,7 @@ void DisableTurboBoostBattery::enableTurboBoost()
 
 void DisableTurboBoostBattery::disableTurboBoost()
 {
-    IOLog("disableTurboBoost, tb_enabled: %d\n", tb_enabled);
+    IOLog("TB:disableTurboBoost, tb_enabled: %d\n", tb_enabled);
     if (tb_enabled) {
         disable_tb();
         tb_enabled = false;
